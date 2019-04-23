@@ -20,6 +20,13 @@ exports.seed = (knex, Promise) => {
     .then(() => {
       console.log("formatting articles date");
       const formattedArticlesData = formatDate(data.articlesData);
+      return formattedArticlesData;
+    })
+    .then(formattedArticlesData => {
+      console.log("seeding articles");
+      return knex("articles")
+        .insert(formattedArticlesData)
+        .returning("*");
     });
 };
 

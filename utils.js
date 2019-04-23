@@ -1,6 +1,6 @@
 exports.formatDate = data => {
   return data.map(obj => {
-    newObj = { ...obj };
+    const newObj = { ...obj };
     const timestamp = obj["created_at"];
     const humanTime = new Date(timestamp);
     newObj["created_at"] = humanTime;
@@ -17,9 +17,11 @@ exports.createRef = (array, key, value) => {
 
 exports.formatData = (data, keyToChange, newKey, refObj) => {
   return data.map(obj => {
-    newObj = { ...obj };
+    const newObj = { ...obj };
     newObj[newKey] = refObj[newObj[keyToChange]];
     delete newObj[keyToChange];
+    newObj["author"] = obj["created_by"];
+    delete newObj["created_by"];
     return newObj;
   });
 };

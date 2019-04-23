@@ -1,4 +1,5 @@
 const data = require("../data/");
+const { formatDate } = require("../../utils");
 
 exports.seed = (knex, Promise) => {
   return knex.migrate
@@ -15,6 +16,10 @@ exports.seed = (knex, Promise) => {
       return knex("users")
         .insert(data.usersData)
         .returning("*");
+    })
+    .then(() => {
+      console.log("formatting articles date");
+      const formattedArticlesData = formatDate(data.articlesData);
     });
 };
 

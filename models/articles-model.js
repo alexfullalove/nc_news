@@ -32,3 +32,12 @@ exports.updateArticleById = ({ inc_votes, article_id }) => {
     .increment("votes", inc_votes)
     .returning("*");
 };
+
+exports.getCommentsByArticle = ({ article_id }) => {
+  return connection
+    .select("comments.*")
+    .from("comments")
+    .where("comments.article_id", "=", article_id)
+    .rightJoin("articles", "articles.article_id", "comments.article_id")
+    .groupBy("comments.comment_id");
+};

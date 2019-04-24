@@ -92,4 +92,14 @@ describe.only("/", () => {
         });
     });
   });
+  describe("/api", () => {
+    it("GET status:200 - comments by Article ID", () => {
+      return request
+        .get("/api/articles/5/comments")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.comments.length).to.eql(2);
+        });
+    });
+  });
 });

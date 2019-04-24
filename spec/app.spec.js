@@ -51,4 +51,14 @@ describe.only("/", () => {
         });
     });
   });
+  describe("/api", () => {
+    it("GET status:200", () => {
+      return request
+        .get("/api/articles?author=rogersop")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles.length).to.eql(3);
+        });
+    });
+  });
 });

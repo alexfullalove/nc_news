@@ -2,7 +2,8 @@ const {
   getArticles,
   getArticleById,
   updateArticleById,
-  getCommentsByArticle
+  getCommentsByArticle,
+  addComment
 } = require("../models/articles-model");
 
 exports.sendArticles = (req, res, next) => {
@@ -26,5 +27,11 @@ exports.patchArticleById = (req, res, next) => {
 exports.sendCommentsByArticle = (req, res, next) => {
   getCommentsByArticle({ ...req.params, ...req.query }).then(comments => {
     res.status(200).send({ comments });
+  });
+};
+
+exports.postComment = (req, res, next) => {
+  addComment({ ...req.params, ...req.body }).then(comment => {
+    res.status(201).send({ comment });
   });
 };

@@ -112,4 +112,26 @@ describe.only("/", () => {
         });
     });
   });
+  describe("/api", () => {
+    it("POST status:201 - adds a comment to an article", () => {
+      return request
+        .post("/api/articles/1/comments")
+        .send({ username: "butter_bridge", comment: "Hello" })
+        .expect(201)
+        .then(({ body }) => {
+          expect(body.comment[0].body).to.eql("Hello");
+        });
+    });
+  });
+  describe("/api", () => {
+    it("PATCH status:200 - increments a vote on a comment", () => {
+      return request
+        .patch("/api/comments/1")
+        .send({ inc_votes: 1 })
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.comment[0].votes).to.eql(17);
+        });
+    });
+  });
 });

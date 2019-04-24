@@ -48,3 +48,13 @@ exports.getCommentsByArticle = ({ article_id, sort_by, order }) => {
     .groupBy("comments.comment_id")
     .orderBy(sort_by || "created_at", order || "desc");
 };
+
+exports.addComment = ({ article_id, username, comment }) => {
+  const obj = { article_id, author: username, body: comment };
+  return connection
+    .select("*")
+    .from("comments")
+    .where("comments.article_id", "=", article_id)
+    .insert(obj)
+    .returning("*");
+};

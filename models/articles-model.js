@@ -1,13 +1,16 @@
 const connection = require("../db/connection");
 
-exports.getArticles = ({ author }) => {
+exports.getArticles = ({ author, topic }) => {
   return connection
     .select("articles.*")
     .from("articles")
-    .where("articles.author", "like", author || "%")
     .leftJoin("comments", "comments.article_id", "articles.article_id")
     .groupBy("articles.article_id")
-    .count("comments.comment_id AS comment_count");
+    .count("comments.comment_id AS comment_count")
+    .modify(query => {
+      if (author) query.where("articles.author", "like", author);
+      if (topic) query.where("articles.topic", "like", topic);
+    });
 };
 
 // exports.getTreasure = ({ sort_by, order, limit, colour, max_age, min_age, max_price, min_price }) => {
@@ -22,7 +25,6 @@ exports.getArticles = ({ author }) => {
 // 		.orderBy(sort_by || 'cost_at_auction', order || 'asc');
 // };
 
-// author, which filters the articles by the username value specified in the query
 // topic, which filters the articles by the topic value specified in the query
 // sort_by, which sorts the articles by any valid column (defaults to date)
 // order, which can be set to asc or desc for ascending or descending (defaults to descending)

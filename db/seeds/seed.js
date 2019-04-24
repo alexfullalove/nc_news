@@ -6,24 +6,20 @@ exports.seed = (knex, Promise) => {
     .rollback()
     .then(() => knex.migrate.latest())
     .then(() => {
-      console.log("seeding topics");
       return knex("topics")
         .insert(data.topicsData)
         .returning("*");
     })
     .then(() => {
-      console.log("seeding users");
       return knex("users")
         .insert(data.usersData)
         .returning("*");
     })
     .then(() => {
-      console.log("formatting articles date");
       const formattedArticlesData = formatDate(data.articlesData);
       return formattedArticlesData;
     })
     .then(formattedArticlesData => {
-      console.log("seeding articles");
       return knex("articles")
         .insert(formattedArticlesData)
         .returning("*");
@@ -40,7 +36,6 @@ exports.seed = (knex, Promise) => {
     })
     .then(formattedCommentData => {
       const formattedCommentDates = formatDate(formattedCommentData);
-      console.log(formattedCommentDates);
       return formattedCommentDates;
     })
     .then(formattedCommentDates => {

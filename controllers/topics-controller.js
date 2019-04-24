@@ -1,7 +1,7 @@
-const { sendTopics } = require("../models/topics-model");
+const { getTopics } = require("../models/topics-model");
 
 exports.sendTopics = (req, res, next) => {
-  getTopics()
-    .res.status(200)
-    .send();
+  getTopics().then(body => {
+    res.status(200).send(body);
+  });
 };

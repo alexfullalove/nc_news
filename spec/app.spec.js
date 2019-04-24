@@ -102,4 +102,14 @@ describe.only("/", () => {
         });
     });
   });
+  describe("/api", () => {
+    it("GET status:200 - comments by Article ID sorted by votes", () => {
+      return request
+        .get("/api/articles/5/comments?sort_by=votes")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.comments[0].votes).to.eql(16);
+        });
+    });
+  });
 });

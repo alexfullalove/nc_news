@@ -33,11 +33,18 @@ exports.updateArticleById = ({ inc_votes, article_id }) => {
     .returning("*");
 };
 
-exports.getCommentsByArticle = ({ article_id }) => {
+exports.getCommentsByArticle = ({ article_id, sort_by, order }) => {
   return connection
-    .select("comments.*")
+    .select(
+      "comment_id",
+      "comments.votes",
+      "comments.created_at",
+      "comments.author",
+      "comments.body"
+    )
     .from("comments")
     .where("comments.article_id", "=", article_id)
     .rightJoin("articles", "articles.article_id", "comments.article_id")
-    .groupBy("comments.comment_id");
+    .groupBy("comments.comment_id")
+    .orderBy(sort_by || "created_at", order || "desc");
 };

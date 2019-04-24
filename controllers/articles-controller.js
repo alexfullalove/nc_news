@@ -24,7 +24,7 @@ exports.patchArticleById = (req, res, next) => {
 };
 
 exports.sendCommentsByArticle = (req, res, next) => {
-  getCommentsByArticle(req.params).then(comments => {
+  getCommentsByArticle({ ...req.params, ...req.query }).then(comments => {
     res.status(200).send({ comments });
   });
 };

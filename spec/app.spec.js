@@ -20,7 +20,7 @@ describe.only("/", () => {
     });
   });
   describe("/api", () => {
-    it("GET status:200", () => {
+    it("GET status:200 - returns all the topics", () => {
       return request
         .get("/api/topics")
         .expect(200)
@@ -33,7 +33,7 @@ describe.only("/", () => {
     });
   });
   describe("/api", () => {
-    it("GET status:200", () => {
+    it("GET status:200 - returns all the articles with correct keys", () => {
       return request
         .get("/api/articles")
         .expect(200)
@@ -52,12 +52,32 @@ describe.only("/", () => {
     });
   });
   describe("/api", () => {
-    it("GET status:200", () => {
+    it("GET status:200 - filters by author", () => {
       return request
         .get("/api/articles?author=rogersop")
         .expect(200)
         .then(({ body }) => {
           expect(body.articles.length).to.eql(3);
+        });
+    });
+  });
+  describe("/api", () => {
+    it("GET status:200 - filters by topic", () => {
+      return request
+        .get("/api/articles?topic=cats")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles.length).to.eql(1);
+        });
+    });
+  });
+  describe("/api", () => {
+    it("GET status:200 - get article by Id", () => {
+      return request
+        .get("/api/articles/1")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.article.length).to.eql(1);
         });
     });
   });

@@ -1,7 +1,8 @@
 const articlesRouter = require("express").Router();
 const {
   sendArticles,
-  sendArticleById
+  sendArticleById,
+  patchArticleById
 } = require("../controllers/articles-controller");
 const { methodNotAllowed } = require("../errors");
 
@@ -13,6 +14,7 @@ articlesRouter
 articlesRouter
   .route("/:article_id")
   .get(sendArticleById)
+  .patch(patchArticleById)
   .all(methodNotAllowed);
 
 module.exports = articlesRouter;

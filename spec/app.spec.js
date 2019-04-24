@@ -81,4 +81,15 @@ describe.only("/", () => {
         });
     });
   });
+  describe("/api", () => {
+    it("PATCH status:200 - increment votes for article by Id", () => {
+      return request
+        .patch("/api/articles/1")
+        .send({ inc_votes: 9 })
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.article[0].votes).to.eql(109);
+        });
+    });
+  });
 });

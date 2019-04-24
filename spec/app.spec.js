@@ -24,4 +24,9 @@ describe.only("/", () => {
       return request.get("/api/topics").expect(200);
     });
   });
+  describe("/api", () => {
+    it("GET status:200", () => {
+      return request.get("/api/articles").expect(200);
+    });
+  });
 });

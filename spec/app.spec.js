@@ -21,12 +21,34 @@ describe.only("/", () => {
   });
   describe("/api", () => {
     it("GET status:200", () => {
-      return request.get("/api/topics").expect(200);
+      return request
+        .get("/api/topics")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.topics[0]).to.eql({
+            description: "The man, the Mitch, the legend",
+            slug: "mitch"
+          });
+        });
     });
   });
   describe("/api", () => {
     it("GET status:200", () => {
-      return request.get("/api/articles").expect(200);
+      return request
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles[0]).to.contain.keys(
+            "author",
+            "title",
+            "article_id",
+            "body",
+            "topic",
+            "created_at",
+            "votes",
+            "comment_count"
+          );
+        });
     });
   });
 });

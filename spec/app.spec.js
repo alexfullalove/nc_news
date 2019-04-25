@@ -144,4 +144,15 @@ describe.only("/", () => {
         });
     });
   });
+  describe("/api", () => {
+    it("GET status:200 - returns user by username", () => {
+      return request
+        .get("/api/users/butter_bridge")
+        .expect(200)
+        .then(({ body }) => {
+          console.log(body.user[0]);
+          expect(body.user[0].name).to.eql("jonny");
+        });
+    });
+  });
 });

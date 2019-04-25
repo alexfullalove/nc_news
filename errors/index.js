@@ -2,6 +2,23 @@ exports.routeNotFound = (req, res) => {
   res.status(404).send({ msg: "Route Not Found" });
 };
 
+exports.handlePsqlErrors = (err, req, res, next) => {
+  console.log(err.code);
+  const psqlCodes = { "22P02": { msg: "Invalid Id", status: 400 } };
+
+  if (psqlCodes[err.code]) {
+    res
+      .status(psqlCodes[err.code].status)
+      .send({ msg: psqlCodes[err.code].msg });
+  } else next(err);
+};
+
+exports.handleCustomErrors = (err, req, res, next) => {
+  if (err.status) {
+    res.status(err.status).send({ message: err.message });
+  } else next(err);
+};
+
 exports.methodNotAllowed = (req, res) => {
   res.status(405).send({ msg: "Method Not Allowed" });
 };

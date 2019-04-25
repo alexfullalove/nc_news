@@ -134,4 +134,14 @@ describe.only("/", () => {
         });
     });
   });
+  describe("/api", () => {
+    it("DELETE status:200 - deletes comment by id and returns nothing", () => {
+      return request
+        .delete("/api/comments/1")
+        .expect(204)
+        .then(({ body }) => {
+          expect(body).to.eql({});
+        });
+    });
+  });
 });

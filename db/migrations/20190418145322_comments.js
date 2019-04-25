@@ -4,6 +4,7 @@ exports.up = function(knex, Promise) {
     commentsTable.increments("comment_id").primary();
     commentsTable
       .string("author")
+      .notNullable()
       .references("username")
       .inTable("users");
     commentsTable

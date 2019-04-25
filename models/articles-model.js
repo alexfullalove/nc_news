@@ -29,7 +29,7 @@ exports.updateArticleById = ({ inc_votes, article_id }) => {
     .select("*")
     .from("articles")
     .where("article_id", "=", article_id)
-    .increment("votes", inc_votes)
+    .increment("votes", +inc_votes)
     .returning("*");
 };
 

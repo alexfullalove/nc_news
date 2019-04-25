@@ -5,7 +5,7 @@ const app = require("../app");
 const connection = require("../db/connection");
 const request = supertest(app);
 
-describe.only("/", () => {
+describe("/", () => {
   beforeEach(() => connection.seed.run());
   after(() => connection.destroy());
 
@@ -31,34 +31,32 @@ describe.only("/", () => {
           });
         });
     });
-    describe("/api", () => {
-      it("GET status:404 - returns NOT FOUND for non existant route", () => {
-        return request
-          .get("/api/banana")
-          .expect(404)
-          .then(({ body }) => {
-            expect(body.message).to.eql();
-          });
-      });
+    it("GET status:404 - returns NOT FOUND for non existant route", () => {
+      return request
+        .get("/api/banana")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.message).to.eql();
+        });
     });
-    describe("/api", () => {
-      it("GET status:200 - returns all the articles with correct keys", () => {
-        return request
-          .get("/api/articles")
-          .expect(200)
-          .then(({ body }) => {
-            expect(body.articles[0]).to.contain.keys(
-              "author",
-              "title",
-              "article_id",
-              "body",
-              "topic",
-              "created_at",
-              "votes",
-              "comment_count"
-            );
-          });
-      });
+  });
+  describe("/api", () => {
+    it("GET status:200 - returns all the articles with correct keys", () => {
+      return request
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles[0]).to.contain.keys(
+            "author",
+            "title",
+            "article_id",
+            "body",
+            "topic",
+            "created_at",
+            "votes",
+            "comment_count"
+          );
+        });
     });
     describe("/api", () => {
       it("GET status:200 - filters by author", () => {
@@ -69,53 +67,96 @@ describe.only("/", () => {
             expect(body.articles.length).to.eql(3);
           });
       });
-      describe.only("/api", () => {
-        it("GET status:404 - responds with 404 page not found", () => {
-          return request
-            .get("/api/articles?author=kuharsgkhasdfkghdhjrg")
-            .expect(404)
-            .then(({ body }) => {
-              expect(body.message).to.eql("article not found");
-            });
+    });
+    it("GET status:404 - responds with 404 page not found", () => {
+      return request
+        .get("/api/articles?author=kuharsgkhasdfkghdhjrg")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.message).to.eql("page not found");
         });
+    });
+  });
+  describe("/api", () => {
+    it("GET status:200 - filters by topic", () => {
+      return request
+        .get("/api/articles?topic=cats")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.articles.length).to.eql(1);
+        });
+    });
+  });
+  it("GET status:404 - filters by topic that does not exist", () => {
+    return request
+      .get("/api/articles?topic=bananas")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).to.eql("page not found");
       });
-      describe.only("/api", () => {
-        it("GET status:404 - responds with 404 page not found", () => {
+  });
+  describe("/api", () => {
+    it("GET status:200 - get article by Id", () => {
+      return request
+        .get("/api/articles/1")
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.article.length).to.eql(1);
+        });
+    });
+    it("GET status:404 - get article by Id", () => {
+      return request
+        .get("/api/articles/99")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.message).to.eql("Invalid Id");
+        });
+    });
+    describe("/api", () => {
+      it("GET status:404 - get article by Id when given a letter not a number", () => {
+        return request
+          .get("/api/articles/q")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.message).to.eql("Invalid Id");
+          });
+      });
+      describe("/api", () => {
+        it("PATCH status:200 - increment votes for article by Id", () => {
           return request
-            .get("/api/articles?author=kuharsgkhasdfkghdhjrg")
-            .expect(404)
+            .patch("/api/articles/1")
+            .send({ inc_votes: 9 })
+            .expect(200)
             .then(({ body }) => {
-              expect(body.message).to.eql("article not found");
+              expect(body.article[0].votes).to.eql(109);
             });
         });
         describe("/api", () => {
-          it("GET status:200 - filters by topic", () => {
+          it("PATCH status:400 - increment votes for article by invalid Id", () => {
             return request
-              .get("/api/articles?topic=cats")
-              .expect(200)
+              .patch("/api/articles/t")
+              .send({ inc_votes: 9 })
+              .expect(400)
               .then(({ body }) => {
-                expect(body.articles.length).to.eql(1);
+                expect(body.message).to.eql("Invalid Id");
               });
           });
-        });
-        describe("/api", () => {
-          it("GET status:200 - get article by Id", () => {
-            return request
-              .get("/api/articles/1")
-              .expect(200)
-              .then(({ body }) => {
-                expect(body.article.length).to.eql(1);
-              });
-          });
-        });
-        describe("/api", () => {
-          it("PATCH status:200 - increment votes for article by Id", () => {
+          it("PATCH status:404 - increment votes for valid article but votes body contains a string", () => {
             return request
               .patch("/api/articles/1")
-              .send({ inc_votes: 9 })
-              .expect(200)
+              .send({ inc_votes: "q" })
+              .expect(400)
               .then(({ body }) => {
-                expect(body.article[0].votes).to.eql(109);
+                expect(body.message).to.eql("Invalid Id");
+              });
+          });
+          it("PATCH status:404 - increment votes for valid article but votes body contains a string", () => {
+            return request
+              .patch("/api/articles/1")
+              .send({})
+              .expect(400)
+              .then(({ body }) => {
+                expect(body.message).to.eql("Invalid Id");
               });
           });
         });
@@ -180,8 +221,6 @@ describe.only("/", () => {
                 expect(body.user[0].name).to.eql("jonny");
               });
           });
-        });
-        describe("/api", () => {
           it("GET status:404 - returns user by username", () => {
             return request
               .get("/api/users/6")

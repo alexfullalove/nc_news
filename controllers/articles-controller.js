@@ -10,7 +10,7 @@ exports.sendArticles = (req, res, next) => {
   getArticles(req.query)
     .then(articles => {
       if (articles.length !== 0) res.status(200).send({ articles });
-      else return Promise.reject({ status: 404, message: "article not found" });
+      else return Promise.reject({ status: 404, message: "page not found" });
     })
     .catch(next);
 };
@@ -18,7 +18,8 @@ exports.sendArticles = (req, res, next) => {
 exports.sendArticleById = (req, res, next) => {
   getArticleById(req.params)
     .then(article => {
-      res.status(200).send({ article });
+      if (article.length !== 0) res.status(200).send({ article });
+      else return Promise.reject({ status: 404, message: "Invalid Id" });
     })
     .catch(next);
 };
@@ -26,6 +27,7 @@ exports.sendArticleById = (req, res, next) => {
 exports.patchArticleById = (req, res, next) => {
   updateArticleById({ ...req.body, ...req.params })
     .then(article => {
+      console.log(article);
       res.status(200).send({ article });
     })
     .catch(next);

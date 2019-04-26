@@ -5,7 +5,7 @@ const app = require("../app");
 const connection = require("../db/connection");
 const request = supertest(app);
 
-describe("/", () => {
+describe.only("/", () => {
   beforeEach(() => connection.seed.run());
   after(() => connection.destroy());
 
@@ -118,7 +118,7 @@ describe("/", () => {
           .get("/api/articles/q")
           .expect(400)
           .then(({ body }) => {
-            expect(body.message).to.eql("Invalid Id");
+            expect(body.message).to.eql("bad request");
           });
       });
       describe("/api", () => {
@@ -138,7 +138,7 @@ describe("/", () => {
               .send({ inc_votes: 9 })
               .expect(400)
               .then(({ body }) => {
-                expect(body.message).to.eql("Invalid Id");
+                expect(body.message).to.eql("bad request");
               });
           });
           it("PATCH status:404 - increment votes for valid article but votes body contains a string", () => {
@@ -147,7 +147,7 @@ describe("/", () => {
               .send({ inc_votes: "q" })
               .expect(400)
               .then(({ body }) => {
-                expect(body.message).to.eql("Invalid Id");
+                expect(body.message).to.eql("bad request");
               });
           });
           it("PATCH status:404 - increment votes for valid article but no votes given", () => {
@@ -156,7 +156,7 @@ describe("/", () => {
               .send({})
               .expect(400)
               .then(({ body }) => {
-                expect(body.message).to.eql("Invalid Id");
+                expect(body.message).to.eql("bad request");
               });
           });
         });
@@ -176,7 +176,7 @@ describe("/", () => {
               .get("/api/articles/z/comments")
               .expect(400)
               .then(({ body }) => {
-                expect(body.message).to.eql("Invalid Id");
+                expect(body.message).to.eql("bad request");
               });
           });
         });
@@ -208,7 +208,7 @@ describe("/", () => {
               });
           });
         });
-        describe.only("/api", () => {
+        describe("/api", () => {
           it("POST status:201 - adds a comment to an article", () => {
             return request
               .post("/api/articles/1/comments")
@@ -224,7 +224,7 @@ describe("/", () => {
               .send({ username: "butter_bridge", comment: "Hello" })
               .expect(400)
               .then(({ body }) => {
-                expect(body.message).to.eql("Invalid Id");
+                expect(body.message).to.eql("bad request");
               });
           });
           it("POST status:400 - ERROR when passing a comment to an article with no body", () => {
@@ -256,14 +256,67 @@ describe("/", () => {
                 expect(body.comment[0].votes).to.eql(17);
               });
           });
+          it("PATCH status:400 - ERROR bad request for invalid id when incrementing a vote", () => {
+            return request
+              .patch("/api/comments/z")
+              .send({ inc_votes: 1 })
+              .expect(400)
+              .then(({ body }) => {
+                expect(body.message).to.eql("bad request");
+              });
+          });
+          it("PATCH status:404 - ERROR bad request for non existent when incrementing a vote", () => {
+            return request
+              .patch("/api/comments/48000")
+              .send({ inc_votes: 1 })
+              .expect(404)
+              .then(({ body }) => {
+                expect(body.message).to.eql("page does not exist");
+              });
+          });
+          it("PATCH status:404 - ERROR bad request for non existent when incrementing a using a string", () => {
+            return request
+              .patch("/api/comments/48000")
+              .send({ inc_votes: "q" })
+              .expect(400)
+              .then(({ body }) => {
+                expect(body.message).to.eql("bad request");
+              });
+          });
+          it("PATCH status:400 - ERROR bad request for an empty votes body", () => {
+            return request
+              .patch("/api/comments/48000")
+              .send({})
+              .expect(400)
+              .then(({ body }) => {
+                console.log(body);
+                expect(body.message).to.eql("bad request");
+              });
+          });
         });
         describe("/api", () => {
-          it("DELETE status:200 - deletes comment by id and returns nothing", () => {
+          it("DELETE status:204 - deletes comment by id and returns nothing", () => {
             return request
               .delete("/api/comments/1")
               .expect(204)
               .then(({ body }) => {
                 expect(body).to.eql({});
+              });
+          });
+          it("DELETE status:400 - ERROR when trying to delete a comment by id that is invalid", () => {
+            return request
+              .delete("/api/comments/z")
+              .expect(400)
+              .then(({ body }) => {
+                expect(body.message).to.eql("bad request");
+              });
+          });
+          it("DELETE status:400 - ERROR when trying to delete a comment by id that does not exist", () => {
+            return request
+              .delete("/api/comments/48000")
+              .expect(404)
+              .then(({ body }) => {
+                expect(body.message).to.eql("page does not exist");
               });
           });
         });

@@ -288,7 +288,6 @@ describe("/", () => {
         .send({})
         .expect(400)
         .then(({ body }) => {
-          console.log(body);
           expect(body.message).to.eql("bad request");
         });
     });

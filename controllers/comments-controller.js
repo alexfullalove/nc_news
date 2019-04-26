@@ -16,7 +16,6 @@ exports.patchCommentById = (req, res, next) => {
 exports.removeComment = (req, res, next) => {
   deleteComment(req.params)
     .then(result => {
-      console.log(result);
       if (result === 1) res.status(204).send({ result });
       else
         return Promise.reject({ status: 404, message: "page does not exist" });

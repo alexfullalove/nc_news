@@ -3,7 +3,6 @@ exports.routeNotFound = (req, res) => {
 };
 
 exports.handlePsqlErrors = (err, req, res, next) => {
-  console.log(err.code);
   const psqlCodes = {
     "22P02": { message: "bad request", status: 400 },
     "42703": { message: "page does not exist", status: 404 },
@@ -18,7 +17,6 @@ exports.handlePsqlErrors = (err, req, res, next) => {
 };
 
 exports.handleCustomErrors = (err, req, res, next) => {
-  console.log(err.status);
   if (err.status) {
     res.status(err.status).send({ message: err.message });
   } else next(err);
@@ -29,6 +27,5 @@ exports.methodNotAllowed = (req, res) => {
 };
 
 exports.handle500 = (err, req, res, next) => {
-  console.log(err);
   res.status(500).send({ msg: "Internal Server Error" });
 };

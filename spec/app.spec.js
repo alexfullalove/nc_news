@@ -150,7 +150,7 @@ describe("/", () => {
                 expect(body.message).to.eql("Invalid Id");
               });
           });
-          it("PATCH status:404 - increment votes for valid article but votes body contains a string", () => {
+          it("PATCH status:404 - increment votes for valid article but no votes given", () => {
             return request
               .patch("/api/articles/1")
               .send({})
@@ -171,6 +171,26 @@ describe("/", () => {
           });
         });
         describe("/api", () => {
+          it("GET status:400 - comments by Article ID when given an invalid article ID", () => {
+            return request
+              .get("/api/articles/z/comments")
+              .expect(400)
+              .then(({ body }) => {
+                expect(body.message).to.eql("Invalid Id");
+              });
+          });
+        });
+        describe("/api", () => {
+          it("GET status:404 - comments by Article ID when given an Id that does not exist", () => {
+            return request
+              .get("/api/articles/48000/comments")
+              .expect(404)
+              .then(({ body }) => {
+                expect(body.message).to.eql("page not found");
+              });
+          });
+        });
+        describe("/api", () => {
           it("GET status:200 - comments by Article ID sorted by votes", () => {
             return request
               .get("/api/articles/5/comments?sort_by=votes")
@@ -179,8 +199,16 @@ describe("/", () => {
                 expect(body.comments[0].votes).to.eql(16);
               });
           });
+          it("GET status:404 - comments by Article ID sorted by a column that does not exist", () => {
+            return request
+              .get("/api/articles/5/comments?sort_by=bananas")
+              .expect(404)
+              .then(({ body }) => {
+                expect(body.message).to.eql("page does not exist");
+              });
+          });
         });
-        describe("/api", () => {
+        describe.only("/api", () => {
           it("POST status:201 - adds a comment to an article", () => {
             return request
               .post("/api/articles/1/comments")
@@ -188,6 +216,33 @@ describe("/", () => {
               .expect(201)
               .then(({ body }) => {
                 expect(body.comment[0].body).to.eql("Hello");
+              });
+          });
+          it("POST status:400 - ERROR when adding a comment to an article with invalid ID", () => {
+            return request
+              .post("/api/articles/z/comments")
+              .send({ username: "butter_bridge", comment: "Hello" })
+              .expect(400)
+              .then(({ body }) => {
+                expect(body.message).to.eql("Invalid Id");
+              });
+          });
+          it("POST status:400 - ERROR when passing a comment to an article with no body", () => {
+            return request
+              .post("/api/articles/1/comments")
+              .send({})
+              .expect(400)
+              .then(({ body }) => {
+                expect(body.message).to.eql("bad request");
+              });
+          });
+          it("POST status:400 - ERROR when passing a comment to an article with no body", () => {
+            return request
+              .post("/api/articles/1/comments")
+              .send({ banana: "butter_bridge", comment: "Hello" })
+              .expect(400)
+              .then(({ body }) => {
+                expect(body.message).to.eql("bad request");
               });
           });
         });

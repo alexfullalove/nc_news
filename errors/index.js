@@ -4,7 +4,11 @@ exports.routeNotFound = (req, res) => {
 
 exports.handlePsqlErrors = (err, req, res, next) => {
   console.log(err.code);
-  const psqlCodes = { "22P02": { message: "Invalid Id", status: 400 } };
+  const psqlCodes = {
+    "22P02": { message: "Invalid Id", status: 400 },
+    "42703": { message: "page does not exist", status: 404 },
+    "23502": { message: "bad request", status: 400 }
+  };
 
   if (psqlCodes[err.code]) {
     res

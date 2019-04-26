@@ -36,7 +36,8 @@ exports.patchArticleById = (req, res, next) => {
 exports.sendCommentsByArticle = (req, res, next) => {
   getCommentsByArticle({ ...req.params, ...req.query })
     .then(comments => {
-      res.status(200).send({ comments });
+      if (comments.length !== 0) res.status(200).send({ comments });
+      else return Promise.reject({ status: 404, message: "page not found" });
     })
     .catch(next);
 };

@@ -58,6 +58,14 @@ describe("/", () => {
           );
         });
     });
+    it("GET status:400 - gives ERROR if sort by request is invalid", () => {
+      return request
+        .get("/api/articles?sort_by=bananas")
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).to.equal("invalid sort request");
+        });
+    });
     describe("/api", () => {
       it("GET status:200 - filters by author", () => {
         return request
@@ -101,7 +109,16 @@ describe("/", () => {
         .get("/api/articles/1")
         .expect(200)
         .then(({ body }) => {
-          expect(body.article.length).to.eql(1);
+          expect(body.article).to.eql({
+            article_id: 1,
+            title: "Living in the shadow of a great man",
+            body: "I find this existence challenging",
+            votes: 100,
+            topic: "mitch",
+            author: "butter_bridge",
+            created_at: "2018-11-15T12:21:54.171Z",
+            comment_count: "13"
+          });
         });
     });
     it("GET status:404 - get article by Id", () => {
@@ -128,7 +145,7 @@ describe("/", () => {
         .send({ inc_votes: 9 })
         .expect(200)
         .then(({ body }) => {
-          expect(body.article[0].votes).to.eql(109);
+          expect(body.article.votes).to.eql(109);
         });
     });
     it("PATCH status:400 - increment votes for article by invalid Id", () => {
@@ -180,12 +197,12 @@ describe("/", () => {
     });
   });
   describe("/api", () => {
-    it("GET status:404 - comments by Article ID when given an Id that does not exist", () => {
+    it("GET status:200 - comments by Article ID when given an Id that does not exist", () => {
       return request
         .get("/api/articles/48000/comments")
-        .expect(404)
+        .expect(200)
         .then(({ body }) => {
-          expect(body.message).to.eql("page not found");
+          expect(body).to.eql({ comments: [] });
         });
     });
   });
@@ -195,15 +212,15 @@ describe("/", () => {
         .get("/api/articles/5/comments?sort_by=votes")
         .expect(200)
         .then(({ body }) => {
-          expect(body.comments[0].votes).to.eql(16);
+          expect(body.comments[0].votes).to.equal(16);
         });
     });
     it("GET status:404 - comments by Article ID sorted by a column that does not exist", () => {
       return request
         .get("/api/articles/5/comments?sort_by=bananas")
-        .expect(404)
+        .expect(400)
         .then(({ body }) => {
-          expect(body.message).to.eql("page does not exist");
+          expect(body.message).to.eql("invalid sort request");
         });
     });
   });
@@ -324,7 +341,7 @@ describe("/", () => {
         .get("/api/users/butter_bridge")
         .expect(200)
         .then(({ body }) => {
-          expect(body.user[0].name).to.eql("jonny");
+          expect(body.user.name).to.eql("jonny");
         });
     });
     it("GET status:404 - returns user by username", () => {

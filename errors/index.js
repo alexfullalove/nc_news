@@ -5,11 +5,12 @@ exports.routeNotFound = (req, res) => {
 exports.handlePsqlErrors = (err, req, res, next) => {
   const psqlCodes = {
     "22P02": { message: "bad request", status: 400 },
-    "42703": { message: "page does not exist", status: 404 },
+    "42703": { message: "invalid sort request", status: 400 },
     "23502": { message: "bad request", status: 400 }
   };
 
   if (psqlCodes[err.code]) {
+    console.log(err.code);
     res
       .status(psqlCodes[err.code].status)
       .send({ message: psqlCodes[err.code].message });

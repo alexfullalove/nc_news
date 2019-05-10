@@ -291,13 +291,12 @@ describe("/", () => {
           expect(body.message).to.eql("bad request");
         });
     });
-    it.only("PATCH status:404 - ERROR bad request for non existent when incrementing a vote", () => {
+    it("PATCH status:404 - ERROR bad request for non existent when incrementing a vote", () => {
       return request
         .patch("/api/comments/48000")
         .send({ inc_votes: 1 })
         .expect(404)
         .then(({ body }) => {
-          console.log("******");
           expect(body.message).to.eql("comment does not exist");
         });
     });

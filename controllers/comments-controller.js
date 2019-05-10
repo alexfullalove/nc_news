@@ -5,10 +5,14 @@ const {
 
 exports.patchCommentById = (req, res, next) => {
   updateCommentById({ ...req.body, ...req.params })
-    .then(comment => {
-      if (comment.length !== 0) res.status(200).send({ comment });
-      else
-        return Promise.reject({ status: 404, message: "page does not exist" });
+    .then(([comment]) => {
+      if (comment) {
+        res.status(200).send({ comment });
+      } else
+        return Promise.reject({
+          status: 404,
+          message: "comment does not exist"
+        });
     })
     .catch(next);
 };

@@ -24,7 +24,7 @@ exports.getArticleById = ({ article_id }) => {
     .count("comments.comment_id AS comment_count");
 };
 
-exports.updateArticleById = ({ inc_votes, article_id }) => {
+exports.updateArticleById = ({ inc_votes = 0, article_id }) => {
   return connection
     .select("*")
     .from("articles")
@@ -49,8 +49,8 @@ exports.getCommentsByArticle = ({ article_id, sort_by, order }) => {
     .orderBy(sort_by || "created_at", order || "desc");
 };
 
-exports.addComment = ({ article_id, username, comment }) => {
-  const obj = { article_id, author: username, body: comment };
+exports.addComment = ({ article_id, username, body }) => {
+  const obj = { article_id, author: username, body };
   return connection
     .select("*")
     .from("comments")

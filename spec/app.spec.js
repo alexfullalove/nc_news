@@ -154,25 +154,35 @@ describe("/", () => {
         .send({ inc_votes: 9 })
         .expect(400)
         .then(({ body }) => {
-          expect(body.message).to.eql("bad request");
+          expect(body.message).to.equal("bad request");
         });
     });
-    it("PATCH status:404 - increment votes for valid article but votes body contains a string", () => {
+    it("PATCH status:400 - increment votes for valid article but votes body contains a string", () => {
       return request
         .patch("/api/articles/1")
         .send({ inc_votes: "q" })
         .expect(400)
         .then(({ body }) => {
-          expect(body.message).to.eql("bad request");
+          expect(body.message).to.equal("bad request");
         });
     });
-    it("PATCH status:404 - increment votes for valid article but no votes given", () => {
+    it("PATCH status:200 - increment votes for valid article but no votes given should ignore and send back unchanged article", () => {
       return request
         .patch("/api/articles/1")
         .send({})
-        .expect(400)
+        .expect(200)
         .then(({ body }) => {
-          expect(body.message).to.eql("bad request");
+          expect(body).to.eql({
+            article: {
+              article_id: 1,
+              title: "Living in the shadow of a great man",
+              body: "I find this existence challenging",
+              votes: 100,
+              topic: "mitch",
+              author: "butter_bridge",
+              created_at: "2018-11-15T12:21:54.171Z"
+            }
+          });
         });
     });
   });
@@ -197,12 +207,12 @@ describe("/", () => {
     });
   });
   describe("/api", () => {
-    it("GET status:200 - comments by Article ID when given an Id that does not exist", () => {
+    it("GET status:404 - comments by Article ID when given an Id that does not exist", () => {
       return request
-        .get("/api/articles/48000/comments")
-        .expect(200)
+        .get("/api/articles/1000/comments")
+        .expect(404)
         .then(({ body }) => {
-          expect(body).to.eql({ comments: [] });
+          expect(body.message).to.equal("ID not found");
         });
     });
   });
@@ -228,10 +238,10 @@ describe("/", () => {
     it("POST status:201 - adds a comment to an article", () => {
       return request
         .post("/api/articles/1/comments")
-        .send({ username: "butter_bridge", comment: "Hello" })
+        .send({ username: "butter_bridge", body: "Hello" })
         .expect(201)
         .then(({ body }) => {
-          expect(body.comment[0].body).to.eql("Hello");
+          expect(body.comment.body).to.eql("Hello");
         });
     });
     it("POST status:400 - ERROR when adding a comment to an article with invalid ID", () => {
@@ -269,7 +279,7 @@ describe("/", () => {
         .send({ inc_votes: 1 })
         .expect(200)
         .then(({ body }) => {
-          expect(body.comment[0].votes).to.eql(17);
+          expect(body.comment.votes).to.eql(17);
         });
     });
     it("PATCH status:400 - ERROR bad request for invalid id when incrementing a vote", () => {
@@ -281,16 +291,17 @@ describe("/", () => {
           expect(body.message).to.eql("bad request");
         });
     });
-    it("PATCH status:404 - ERROR bad request for non existent when incrementing a vote", () => {
+    it.only("PATCH status:404 - ERROR bad request for non existent when incrementing a vote", () => {
       return request
         .patch("/api/comments/48000")
         .send({ inc_votes: 1 })
         .expect(404)
         .then(({ body }) => {
-          expect(body.message).to.eql("page does not exist");
+          console.log("******");
+          expect(body.message).to.eql("comment does not exist");
         });
     });
-    it("PATCH status:404 - ERROR bad request for non existent when incrementing a using a string", () => {
+    it("PATCH status:400 - ERROR bad request for non existent when incrementing a using a string", () => {
       return request
         .patch("/api/comments/48000")
         .send({ inc_votes: "q" })
@@ -299,13 +310,16 @@ describe("/", () => {
           expect(body.message).to.eql("bad request");
         });
     });
-    it("PATCH status:400 - ERROR bad request for an empty votes body", () => {
+    it("PATCH status:200 - ERROR bad request for an empty votes body", () => {
       return request
-        .patch("/api/comments/48000")
+        .patch("/api/comments/1")
         .send({})
-        .expect(400)
+        .expect(200)
         .then(({ body }) => {
-          expect(body.message).to.eql("bad request");
+          console.log(body);
+          expect(body.comment.body).to.eql(
+            "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!"
+          );
         });
     });
   });

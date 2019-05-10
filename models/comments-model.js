@@ -1,6 +1,6 @@
 const connection = require("../db/connection");
 
-exports.updateCommentById = ({ inc_votes, comment_id }) => {
+exports.updateCommentById = ({ inc_votes = 0, comment_id }) => {
   return connection
     .select("*")
     .from("comments")

@@ -35,7 +35,8 @@ exports.patchArticleById = (req, res, next) => {
 exports.sendCommentsByArticle = (req, res, next) => {
   getCommentsByArticle({ ...req.params, ...req.query })
     .then(comments => {
-      res.status(200).send({ comments });
+      if (comments.length !== 0) res.status(200).send({ comments });
+      else return Promise.reject({ status: 404, message: "ID not found" });
     })
     .catch(next);
 };
@@ -43,7 +44,7 @@ exports.sendCommentsByArticle = (req, res, next) => {
 exports.postComment = (req, res, next) => {
   addComment({ ...req.params, ...req.body })
     .then(comment => {
-      res.status(201).send({ comment });
+      res.status(201).send({ comment: comment[0] });
     })
     .catch(next);
 };

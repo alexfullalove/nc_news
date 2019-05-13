@@ -366,4 +366,53 @@ describe("/", () => {
         });
     });
   });
+  describe("/api", () => {
+    it("POST status:201 - adds an article", () => {
+      return request
+        .post("/api/articles")
+        .send({
+          title: "bananas",
+          username: "butter_bridge",
+          topic: "cats",
+          body: "bananas are green until they are yellow"
+        })
+        .expect(201)
+        .then(({ body }) => {
+          expect(body.article.body).to.eql(
+            "bananas are green until they are yellow"
+          );
+        });
+    });
+    it("POST status:400 - post an article with a topic that does not exist", () => {
+      return request
+        .post("/api/articles")
+        .send({
+          title: "bananas",
+          username: "butter_bridge",
+          topic: "bananas",
+          body: "bananas are green until they are yellow"
+        })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.message).to.eql("bad post request");
+        });
+    });
+  });
+  describe("/api", () => {
+    it("POST status:201 - adds a new user", () => {
+      return request
+        .post("/api/users")
+        .send({
+          username: "doejohn",
+          name: "doe",
+          avatar_url:
+            "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4"
+        })
+        .expect(201)
+        .then(({ body }) => {
+          console.log(body);
+          expect(body.user.username).to.eql("doejohn");
+        });
+    });
+  });
 });

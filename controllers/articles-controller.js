@@ -3,7 +3,8 @@ const {
   getArticleById,
   updateArticleById,
   getCommentsByArticle,
-  addComment
+  addComment,
+  createArticle
 } = require("../models/articles-model");
 
 exports.sendArticles = (req, res, next) => {
@@ -20,6 +21,14 @@ exports.sendArticleById = (req, res, next) => {
     .then(([article]) => {
       if (article !== undefined) res.status(200).send({ article });
       else return Promise.reject({ status: 404, message: "Invalid Id" });
+    })
+    .catch(next);
+};
+
+exports.postArticle = (req, res, next) => {
+  createArticle(req.body)
+    .then(([article]) => {
+      res.status(201).send({ article });
     })
     .catch(next);
 };

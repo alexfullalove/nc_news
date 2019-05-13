@@ -6,7 +6,9 @@ exports.handlePsqlErrors = (err, req, res, next) => {
   const psqlCodes = {
     "22P02": { message: "bad request", status: 400 },
     "42703": { message: "invalid sort request", status: 400 },
-    "23502": { message: "bad request", status: 400 }
+    "23502": { message: "bad request", status: 400 },
+    "23503": { message: "bad post request", status: 400 },
+    "23505": { message: "user already exists", status: 400 }
   };
 
   if (psqlCodes[err.code]) {

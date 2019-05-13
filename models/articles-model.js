@@ -1,12 +1,21 @@
 const connection = require("../db/connection");
 
-exports.getArticles = ({ author, topic, sort_by, order }) => {
+exports.getArticles = ({
+  author,
+  topic,
+  sort_by,
+  order,
+  limit = 10,
+  page = 1
+}) => {
   return connection
     .select("articles.*")
     .from("articles")
     .leftJoin("comments", "comments.article_id", "articles.article_id")
     .groupBy("articles.article_id")
     .count("comments.comment_id AS comment_count")
+    .limit(limit)
+    .offset(limit * (page - 1))
     .orderBy(sort_by || "created_at", order || "desc")
     .modify(query => {
       if (author) query.where("articles.author", "like", author);
@@ -33,6 +42,15 @@ exports.updateArticleById = ({ inc_votes = 0, article_id }) => {
     .returning("*");
 };
 
+exports.createArticle = ({ title, username, topic, body }) => {
+  const articleObj = { title, author: username, topic, body };
+  return connection
+    .select("*")
+    .from("articles")
+    .insert(articleObj)
+    .returning("*");
+};
+
 exports.getCommentsByArticle = ({ article_id, sort_by, order }) => {
   return connection
     .select(
@@ -46,7 +64,9 @@ exports.getCommentsByArticle = ({ article_id, sort_by, order }) => {
     .where("comments.article_id", "=", article_id)
     .rightJoin("articles", "articles.article_id", "comments.article_id")
     .groupBy("comments.comment_id")
-    .orderBy(sort_by || "created_at", order || "desc");
+    .orderBy(sort_by || "created_at", order || "desc")
+    .limit(limit)
+    .offset(limit * (page - 1));
 };
 
 exports.addComment = ({ article_id, username, body }) => {

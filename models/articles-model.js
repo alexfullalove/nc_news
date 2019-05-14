@@ -51,7 +51,13 @@ exports.createArticle = ({ title, username, topic, body }) => {
     .returning("*");
 };
 
-exports.getCommentsByArticle = ({ article_id, sort_by, order }) => {
+exports.getCommentsByArticle = ({
+  article_id,
+  sort_by,
+  order,
+  limit = 10,
+  page = 1
+}) => {
   return connection
     .select(
       "comment_id",
